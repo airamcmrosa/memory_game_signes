@@ -38,6 +38,7 @@ export class Background {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
 
+
         for (let i = 0; i < starCount; i++) {
             this.stars.push(new Star(this.canvasWidth, this.canvasHeight));
         }
@@ -50,6 +51,7 @@ export class Background {
 
     // Add draw method to draw all stars
     draw(ctx) {
+
         this.stars.forEach(star => {
             star.draw(ctx);
         });

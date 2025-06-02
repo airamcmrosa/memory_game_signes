@@ -10,12 +10,22 @@
 
   <script defer src="js/signes.js"></script>
   <link rel="shortcut icon" href="images/logotipo.png" type="image/x-icon">
-  <title>Les signes du Zodiaque </title>
+  <title>Les caractéristiques du Zodiaque</title>
 </head>
+
+<audio id="background-music" loop>
+  <source src="nebulosa.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+<div class="controls">
+  <button id="music-toggle-btn">Play Music</button>
+</div>
+
 <body>
 
 <canvas id="gameCanvas"></canvas>
 <script type="module" src="js/main.js"></script>
+
 
 
     
@@ -23,10 +33,7 @@
 <!--      <header>-->
 <!--        <span>Durée: <span class="timer">00</span></span>-->
 <!--      </header>-->
-<!--      <div class="grid"></div>-->
-<!--      <div class="audio-player-div"> <audio class= "audio-player" controls loop autoplay>-->
-<!--  <source src="nebulosa.mp3" type="audio/mpeg">-->
-<!--</audio> </div>-->
+
 <!--    </main>-->
 
   </body>
