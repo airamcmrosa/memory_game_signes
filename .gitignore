@@ -1,0 +1,5 @@
+# JetBrains IDE folder
+.idea/
+
+# Dependency folder for Node.js projects
+node_modules/
