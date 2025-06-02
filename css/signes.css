@@ -1,16 +1,13 @@
 body {
-    position: relative;
-  }
-  
-  .background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -3; /* Mantém o fundo atrás de todo o conteúdo */
-  }
-  
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+}
+
+canvas {
+  display: block;
+}
+
   .stars, .twinkling, .clouds {
     position: absolute;
     top: 0;
@@ -18,94 +15,35 @@ body {
     width: 100%;
     height: 100%;
   }
-  
+
   .stars {
     background: #000 url(../images/stars.png) repeat top center;
     z-index: -3;
   }
-  
+
   .twinkling {
     background: transparent url(../images/twinkling.png) repeat top center;
     z-index: -2;
     animation: move-twink-back 200s linear infinite;
   }
-  
+
   .clouds {
     background: transparent url(../images/clouds.png) repeat top center;
     z-index: -1;
     opacity: 0.4;
     animation: move-clouds-back 200s linear infinite;
   }
-  
-  main {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 20px 50px;
-  }
-  
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.8);
-    font-size: 1.2em;
-    width: 100%;
-    max-width: 800px;
-    padding: 30px;
-    margin: 0 0 30px;
-    border-radius: 5px;
-  }
-  
-  .audio-player {
-        width: 150px;
-  }
-  
-  .audio-player-div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 150px;
-    padding: 30px;
-    margin: 30px 0 0 30px;
-  }
-  
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 15px;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    z-index: 1; /* Certifique-se de que o grid esteja acima do fundo */
-  }
-  
-  .card {
-    aspect-ratio: 3/4;
-    width: 100%;
-    position: relative;
-    transition: all 800ms ease;
-    transform-style: preserve-3d;
-  }
-  
-  * {
-    margin: 0;
-    padding: 0;
-  }
-  
+
   @keyframes move-twink-back {
     from { background-position: 0 0; }
     to { background-position: -10000px 5000px; }
   }
-  
+
   @keyframes move-clouds-back {
     from { background-position: 0 0; }
     to { background-position: 10000px 0; }
   }
-  
+
   .face {
     width: 100%;
     height: 100%;
@@ -114,39 +52,3 @@ body {
     background-position: center;
     transition: all 1400ms ease;
   }
-  
-  .front {
-    transform: rotateY(180deg);
-  }
-  
-  .back {
-    background-image: url('../images/back.png');
-    backface-visibility: hidden;
-  }
-  
-  .reveal-card {
-    transform: rotateY(180deg);
-
-  }
-  
-  .disabled-card {
-    filter: saturate(0);
-    opacity: 0.5;
-  }
-  
-  @media screen and (max-width: 920px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
-    header {
-    
-    font-size: 0.9em;
-    width: 70%;
-    max-width: 300px;
-    padding: 30px;
-    margin: 0 0 30px;
-    border-radius: 5px;
-  }
-
-  
