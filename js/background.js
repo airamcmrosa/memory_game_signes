@@ -11,8 +11,7 @@ class Star {
         this.twinkleDirection = 1;
     }
 
-    update() {
-        // Update the opacity
+    update(canvasWidth) {
         this.opacity += this.twinkleDirection * this.twinkleSpeed;
 
         // If the star is fully opaque or fully transparent, reverse the direction
@@ -33,16 +32,23 @@ class Star {
 
 
 export class Background {
-    constructor(starCount, canvasWidth, canvasHeight) {
+    constructor(starCount) {
+        this.starCount = starCount;
         this.stars = [];
+
+    }
+
+    resize(canvasWidth, canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
 
-
-        for (let i = 0; i < starCount; i++) {
-            this.stars.push(new Star(this.canvasWidth, this.canvasHeight));
+        if (this.stars.length === 0) {
+            for (let i = 0; i < this.starCount; i++) {
+                this.stars.push(new Star(this.canvasWidth, this.canvasHeight));
+            }
         }
     }
+
     update() {
         this.stars.forEach(star => {
             star.update(this.canvasWidth);

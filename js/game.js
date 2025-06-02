@@ -1,77 +1,142 @@
 export class Game {
-    constructor() {
-        this.cardImages = {};
-        this.backImage = new Image();
-        this.backImage.src = 'images/back.png'; //
-
-        this.backImage.onload = () => {
-            this.imagesLoaded = true;
-        }
+    constructor(onGameOver, canvasWidth, canvasHeight) {
+        this.onGameOver = onGameOver;
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
 
         const characters = [
-            { signe: "Bélier", caractéristique: "susceptible" },
-            { signe: "Taureau", caractéristique: "déterminé" },
-            { signe: "Gémeaux", caractéristique: "curieux" },
-            { signe: "Cancer", caractéristique: "émotif" },
-            { signe: "Lion", caractéristique: "charismatique" },
-            { signe: "Vierge", caractéristique: "perfectionniste" },
-            { signe: "Balance", caractéristique: "équilibré" },
-            { signe: "Scorpion", caractéristique: "passionné" },
-            { signe: "Sagittaire", caractéristique: "aventurier" },
-            { signe: "Capricorne", caractéristique: "ambitieux" },
-            { signe: "Verseau", caractéristique: "indépendant" },
-            { signe: "Poissons", caractéristique: "imaginatif" }
+            {signe: "Bélier", caractéristique: "susceptible", signeFile: "belier", caracteristiqueFile: "susceptible"},
+            {signe: "Taureau", caractéristique: "déterminé", signeFile: "taureau", caracteristiqueFile: "determine"},
+            {signe: "Gémeaux", caractéristique: "curieux", signeFile: "gemeaux", caracteristiqueFile: "curieux"},
+            {signe: "Cancer", caractéristique: "émotif", signeFile: "cancer", caracteristiqueFile: "emotif"},
+            {signe: "Lion", caractéristique: "charismatique", signeFile: "lion", caracteristiqueFile: "charismatique"},
+            {
+                signe: "Vierge",
+                caractéristique: "perfectionniste",
+                signeFile: "vierge",
+                caracteristiqueFile: "perfectionniste"
+            },
+            {signe: "Balance", caractéristique: "équilibré", signeFile: "balance", caracteristiqueFile: "equilibre"},
+            {signe: "Scorpion", caractéristique: "passionné", signeFile: "scorpion", caracteristiqueFile: "passionne"},
+            {
+                signe: "Sagittaire",
+                caractéristique: "aventurier",
+                signeFile: "sagittaire",
+                caracteristiqueFile: "aventurier"
+            },
+            {
+                signe: "Capricorne",
+                caractéristique: "ambitieux",
+                signeFile: "capricorne",
+                caracteristiqueFile: "ambitieux"
+            },
+            {
+                signe: "Verseau",
+                caractéristique: "indépendant",
+                signeFile: "verseau",
+                caracteristiqueFile: "independant"
+            },
+            {signe: "Poissons", caractéristique: "imaginatif", signeFile: "poissons", caracteristiqueFile: "imaginatif"}
         ];
+        this.deck = [];
 
-        // --- Deck Creation Logic ---
+        this.layout = {};
+        this.initializeDeckAndLayout(characters);
+        this.loadImages();
+    }
 
-        // 1. Shuffle the full list of characters to get a random set each time.
+    initializeDeckAndLayout(characters) {
         const shuffledCharacters = characters.sort(() => 0.5 - Math.random());
-
-        // 2. Select the first 6 characters for this game.
         const selectedCharacters = shuffledCharacters.slice(0, 6);
-
         const cardPairs = [];
-        // 3. Create card pairs from the selected characters.
         selectedCharacters.forEach((character, index) => {
-            // Add new state properties to each card object
             cardPairs.push({
-                type: 'signe', value: character.signe, pairId: index,
+                type: 'signe', value: character.signe, imageFile: character.signeFile, pairId: index,
                 isFlipped: false, isMatched: false
             });
             cardPairs.push({
-                type: 'caracteristique', value: character.caractéristique, pairId: index,
+                type: 'caracteristique', value: character.caractéristique, imageFile: character.caracteristiqueFile, pairId: index,
                 isFlipped: false, isMatched: false
             });
         });
-
-        // 4. Shuffle the final 12-card deck and assign it to the instance.
         this.deck = cardPairs.sort(() => 0.5 - Math.random());
 
-        // --- NEW PROPERTIES ---
+        // Configura o estado inicial do jogo
         this.flippedCards = [];
         this.cardImages = {};
         this.imagesLoaded = 0;
-        this.totalImages = 13; // 12 card fronts + 1 back
+        this.totalImages = this.deck.length + 1;
 
+        // Calcula o layout inicial
+        this.resize(this.canvasWidth, this.canvasHeight);
+    }
+    loadImages() {
         this.backImage = new Image();
-        this.backImage.src = 'images/back.png';
+        this.backImage.src = './images/back.png';
         this.backImage.onload = () => this.imageLoaded();
 
         this.deck.forEach(card => {
-            this.cardImages[card.value] = new Image();
-            this.cardImages[card.value].src = `images/${card.value}.png`;
-            this.cardImages[card.value].onload = () => this.imageLoaded();
+            this.cardImages[card.imageFile] = new Image();
+            this.cardImages[card.imageFile].src = `images/${card.imageFile}.png`;
+            this.cardImages[card.imageFile].onload = () => this.imageLoaded();
         });
     }
+    calculateLayout(canvasWidth, canvasHeight) {
+        const isPortrait = canvasHeight > canvasWidth;
+
+        // Define o número de colunas baseado na orientação da tela
+        const cardsPerRow = isPortrait ? 3 : 6;
+        const numRows = 12 / cardsPerRow;
+
+        // Usa 90% da tela para o grid, deixando 5% de margem em cada lado
+        const availableWidth = canvasWidth * 0.9;
+        const availableHeight = canvasHeight * 0.75;
+
+        // Calcula o tamanho do card, mantendo a proporção 2:3 (largura:altura)
+        const cardAspectRatio = 2 / 3;
+        let cardWidth = availableWidth / cardsPerRow;
+        let cardHeight = cardWidth / cardAspectRatio;
+
+        if (cardHeight * numRows > availableHeight) {
+            cardHeight = availableHeight / numRows;
+            cardWidth = cardHeight * cardAspectRatio;
+        }
+
+        const padding = cardWidth * 0.15; // O espaçamento será 15% da largura do card
+        const gridWidth = (cardsPerRow * (cardWidth + padding)) - padding;
+        const gridHeight = (numRows * (cardHeight + padding)) - padding;
+
+        this.layout = {
+            cardsPerRow, numRows, cardWidth, cardHeight, padding,
+            offsetX: (canvasWidth - gridWidth) / 2,
+            offsetY: (canvasHeight - gridHeight) / 2,
+        };
+    }
+    resize(canvasWidth, canvasHeight) {
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.calculateLayout(canvasWidth, canvasHeight);
+
+        this.deck.forEach((card, index) => {
+            const layout = this.layout;
+            const row = Math.floor(index / layout.cardsPerRow);
+            const col = index % layout.cardsPerRow;
+
+            card.x = layout.offsetX + col * (layout.cardWidth + layout.padding);
+            card.y = layout.offsetY + row * (layout.cardHeight + layout.padding);
+            card.width = layout.cardWidth;
+            card.height = layout.cardHeight;
+        });
+    }
+
+
 
     imageLoaded() {
         this.imagesLoaded++;
     }
 
-    // --- NEW METHOD: To handle clicks passed from main.js ---
-    handleGameClick(x, y) {
-        // Don't allow clicking more cards if two are already flipped
+    handleGameInput(x, y) {
+
         if (this.flippedCards.length === 2) {
             return;
         }
@@ -83,7 +148,7 @@ export class Game {
 
                 card.isFlipped = true;
                 this.flippedCards.push(card);
-                break; // Stop after finding the clicked card
+                break;
             }
         }
 
@@ -93,61 +158,46 @@ export class Game {
         }
     }
 
-    // --- NEW METHOD: To check for matches ---
+
     checkMatch() {
         const [card1, card2] = this.flippedCards;
 
         if (card1.pairId === card2.pairId) {
-            // It's a match!
+
             card1.isMatched = true;
             card2.isMatched = true;
+
+            const allMatched = this.deck.every(card => card.isMatched);
+            if (allMatched) {
+                // Notifica o main.js que o jogo acabou
+                setTimeout(() => this.onGameOver(), 500);
+            }
+
         } else {
-            // Not a match, flip them back
+
             card1.isFlipped = false;
             card2.isFlipped = false;
         }
 
-        // Clear the flipped cards array for the next turn
         this.flippedCards = [];
     }
 
-    // --- UPDATED draw METHOD ---
-    draw(ctx, canvasWidth, canvasHeight) {
+    draw(ctx) {
         if (this.imagesLoaded < this.totalImages) return;
 
-        const cardsPerRow = 6;
-        const cardWidth = 100;
-        const cardHeight = 150;
-        const padding = 20;
-        const totalGridWidth = (cardsPerRow * (cardWidth + padding)) - padding;
-        const offsetX = (canvasWidth - totalGridWidth) / 2;
-        const offsetY = (canvasHeight - (2 * cardHeight + padding)) / 2;
-
-        this.deck.forEach((card, index) => {
-            const row = Math.floor(index / cardsPerRow);
-            const col = index % cardsPerRow;
-            card.x = offsetX + col * (cardWidth + padding);
-            card.y = offsetY + row * (cardHeight + padding);
-            card.width = cardWidth;
-            card.height = cardHeight;
-
-            // Save the context state
+        this.deck.forEach(card => {
             ctx.save();
-
-            // If a card is matched, draw it slightly faded
             if (card.isMatched) {
                 ctx.globalAlpha = 0.5;
             }
 
-            // Draw the card front or back based on its state
             if (card.isFlipped || card.isMatched) {
-                ctx.drawImage(this.cardImages[card.value], card.x, card.y, card.width, card.height);
+                ctx.drawImage(this.cardImages[card.imageFile], card.x, card.y, card.width, card.height);
             } else {
                 ctx.drawImage(this.backImage, card.x, card.y, card.width, card.height);
             }
-
-            // Restore the context state
             ctx.restore();
         });
     }
+
 }

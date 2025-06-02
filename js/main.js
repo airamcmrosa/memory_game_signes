@@ -12,12 +12,42 @@ window.onload = function () {
     canvas.height = window.innerHeight;
 
     const starCount = 200;
-    const background = new Background(starCount, canvas.width, canvas.height);
-    const footer = new Footer(canvas.width, canvas.height);
-    const menu = new Menu(canvas.width, canvas.height);
+    const background = new Background(starCount);
+    const footer = new Footer();
+    const menu = new Menu();
 
-    let gameState = 'menu'; // Our state machine variable
+    let gameState = 'menu';
     let game = null;
+    let playAgainButton = {};
+
+    canvas.addEventListener('click', handleInteraction);
+    canvas.addEventListener('touchstart', handleInteraction);
+    window.addEventListener('resize', resize);
+
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+
+        background.resize(canvas.width, canvas.height);
+        footer.resize(canvas.width, canvas.height);
+        menu.resize(canvas.width, canvas.height);
+
+        if (gameState === 'playing' || gameState === 'gameOver') {
+            game.resize(canvas.width, canvas.height);
+        }
+    }
+
+    function isClickInside(button, x, y) {
+        return x >= button.x && x <= button.x + button.width &&
+            y >= button.y && y <= button.y + button.height;
+    }
+    resize()
+    function startGame() {
+        game = new Game(() => { gameState = 'gameOver'; }, canvas.width, canvas.height);
+        gameState = 'playing';
+    }
 
     const music = document.getElementById('background-music');
     const musicButton = document.getElementById('music-toggle-btn');
@@ -32,48 +62,84 @@ window.onload = function () {
             musicButton.textContent = 'Play Music';
         }
     });
+    function handleInteraction(event) {
 
-    canvas.addEventListener('click', (event) => {
-        if (gameState === 'menu') {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
-            const mouseY = event.clientY - rect.top;
-            const btn = menu.playButton;
+        event.preventDefault();
 
-            if (mouseX >= btn.x && mouseX <= btn.x + btn.width &&
-                mouseY >= btn.y && mouseY <= btn.y + btn.height) {
+        const rect = canvas.getBoundingClientRect();
+        let mouseX, mouseY;
 
-                console.log('Play button clicked!');
-                game = new Game(); // Create a new game instance
-                gameState = 'playing'; // Change the state
-            }
-        } else if (gameState === 'playing') {
-            // We will add game click logic here later
+
+        if (event.touches && event.touches.length > 0) {
+            mouseX = event.touches[0].clientX - rect.left;
+            mouseY = event.touches[0].clientY - rect.top;
+        } else {
+
+            mouseX = event.clientX - rect.left;
+            mouseY = event.clientY - rect.top;
         }
-    });
 
+        if (gameState === 'menu' && isClickInside(menu.playButton, mouseX, mouseY)) {
+            startGame();
+        } else if (gameState === 'playing') {
+            game.handleGameInput(mouseX, mouseY);
+        } else if (gameState === 'gameOver' && isClickInside(playAgainButton, mouseX, mouseY)) {
+            startGame();
+        }
+    }
+
+
+    function drawEndGameScreen() {
+        // Overlay semitransparente
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Mensagem de "Félicitations!"
+        ctx.fillStyle = 'white';
+        ctx.font = '50px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Félicitations!', canvas.width / 2, canvas.height / 2 - 80);
+
+        // Define e desenha o botão "Play Again"
+        playAgainButton = {
+            width: 320,
+            height: 70,
+            x: canvas.width / 2 - 160,
+            y: canvas.height / 2,
+            text: 'Play Again'
+        };
+        const btn = playAgainButton;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
+        ctx.font = '24px "Press Start 2P"';
+        ctx.fillText(btn.text, canvas.width / 2, btn.y + btn.height / 2);
+    }
 
 
     // Create the main animation loop
     function animate() {
-        // 1. Clear the canvas with a black background
+
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Update and draw the background
+
         background.update();
         background.draw(ctx);
 
         if (gameState === 'menu') {
             menu.draw(ctx);
         } else if (gameState === 'playing') {
-            game.draw(ctx, canvas.width, canvas.height);
-        }
+            game.draw(ctx);
+        } else if (gameState === 'gameOver') {
 
+            game.draw(ctx);
+            drawEndGameScreen();
+        }
         footer.draw(ctx);
         requestAnimationFrame(animate);
     }
 
-    // Start the animation
     animate();
 };
