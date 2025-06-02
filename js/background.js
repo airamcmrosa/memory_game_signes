@@ -4,21 +4,33 @@ class Star {
         this.y = Math.random() * canvasHeight;
         this.size = Math.random() * 2 + 1; // Size from 1 to 3
         this.speed = Math.random() * 0.5 + 0.1; // Speed from 0.1 to 0.6
+        // --- NEW PROPERTIES FOR TWINKLING ---
+        // Start with a random opacity
+        this.opacity = Math.random();
+        this.twinkleSpeed = Math.random() * 0.007;
+        this.twinkleDirection = 1;
     }
 
-    update(canvasWidth) {
-        this.x += this.speed;
-        // If star goes off the right side, reset it to the left
-        if (this.x > canvasWidth) {
-            this.x = 0;
+    update() {
+        // Update the opacity
+        this.opacity += this.twinkleDirection * this.twinkleSpeed;
+
+        // If the star is fully opaque or fully transparent, reverse the direction
+        if (this.opacity > 1) {
+            this.opacity = 1;
+            this.twinkleDirection = -1;
+        } else if (this.opacity < 0) {
+            this.opacity = 0;
+            this.twinkleDirection = 1;
         }
     }
+
     draw(ctx) {
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
-
 }
+
 
 export class Background {
     constructor(starCount, canvasWidth, canvasHeight) {
