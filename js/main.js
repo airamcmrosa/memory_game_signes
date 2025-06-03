@@ -3,7 +3,7 @@ import {Menu} from "./menu.js";
 import { Footer } from './footer.js';
 import {Game} from "./game.js";
 import {SoundManager} from "./soundManager.js";
-
+import {EndScreen} from "./endScreen.js"
 
 
 window.onload = function () {
@@ -17,10 +17,10 @@ window.onload = function () {
     const background = new Background(starCount);
     const footer = new Footer();
     const menu = new Menu();
+    const endScreen = new EndScreen(startGame);
 
     let gameState = 'menu';
     let game = null;
-    let playAgainButton = {};
 
     const soundManager = new SoundManager({
         click: 'click-sound',
@@ -35,9 +35,10 @@ window.onload = function () {
         background.resize(canvas.width, canvas.height);
         footer.resize(canvas.width, canvas.height);
         menu.resize(canvas.width, canvas.height);
+        endScreen.resize(canvas.width, canvas.height);
 
         if (gameState === 'playing' || gameState === 'gameOver') {
-            game.resize(canvas.width, canvas.height);
+            if(game) game.resize(canvas.width, canvas.height);
         }
     }
 
@@ -51,7 +52,8 @@ window.onload = function () {
 
 
     function startGame() {
-        game = new Game(() => { gameState = 'gameOver'; }, canvas.width, canvas.height, soundManager);
+        game = new Game(
+            () => { gameState = 'gameOver'; }, canvas.width, canvas.height, soundManager);
         gameState = 'playing';
     }
 
@@ -88,25 +90,17 @@ window.onload = function () {
 
         if (gameState === 'menu' && isClickInside(menu.playButton, mouseX, mouseY)) {
             startGame();
-        } else if (gameState === 'playing') {
+        } else if (gameState === 'playing' && game) {
             game.handleGameInput(mouseX, mouseY);
-        } else if (gameState === 'gameOver' && isClickInside(playAgainButton, mouseX, mouseY)) {
-            startGame();
+        } else if (gameState === 'gameOver') {
+            endScreen.handleInput(mouseX, mouseY);
         }
     }
 
     canvas.addEventListener('click', handleInteraction);
     canvas.addEventListener('touchstart', handleInteraction);
 
-    function drawEndGameScreen() {
 
-
-
-
-    }
-
-
-    // Create the main animation loop
     function animate() {
 
         ctx.fillStyle = 'black';
@@ -118,12 +112,12 @@ window.onload = function () {
 
         if (gameState === 'menu') {
             menu.draw(ctx);
-        } else if (gameState === 'playing') {
+        } else if (gameState === 'playing' && game) {
             game.draw(ctx);
         } else if (gameState === 'gameOver') {
 
             game.draw(ctx);
-            drawEndGameScreen();
+            endScreen.draw(ctx, canvas.width, canvas.height);
         }
         footer.draw(ctx);
         requestAnimationFrame(animate);

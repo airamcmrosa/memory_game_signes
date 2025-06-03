@@ -19,4 +19,13 @@ export class Footer {
         ctx.textBaseline = 'bottom'; // Align text from its bottom edge
         ctx.fillText(this.text, this.position.x, this.position.y);
     }
+
+    // handleInput(x, y) {
+    //     const btn = this.playAgainButton;
+    //     if (btn.width &&
+    //         x >= btn.x && x <= btn.x + btn.width &&
+    //         y >= btn.y && y <= btn.y + btn.height) {
+    //         this.onRestart();
+    //     }
+    // }
 }
