@@ -1,8 +1,9 @@
 export class Game {
-    constructor(onGameOver, canvasWidth, canvasHeight) {
+    constructor(onGameOver, canvasWidth, canvasHeight, soundManager) {
         this.onGameOver = onGameOver;
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
+        this.soundManager = soundManager
 
         const characters = [
             {signe: "Bélier", caractéristique: "susceptible", signeFile: "belier", caracteristiqueFile: "susceptible"},
@@ -88,11 +89,12 @@ export class Game {
         const cardsPerRow = isPortrait ? 3 : 6;
         const numRows = 12 / cardsPerRow;
 
-        // Usa 90% da tela para o grid, deixando 5% de margem em cada lado
-        const availableWidth = canvasWidth * 0.9;
-        const availableHeight = canvasHeight * 0.75;
+        const topMargin = 150;
 
-        // Calcula o tamanho do card, mantendo a proporção 2:3 (largura:altura)
+        const availableWidth = canvasWidth * 0.9;
+        const bottomMargin = canvasHeight * 0.05;
+        const availableHeight = canvasHeight - topMargin - bottomMargin;
+
         const cardAspectRatio = 2 / 3;
         let cardWidth = availableWidth / cardsPerRow;
         let cardHeight = cardWidth / cardAspectRatio;
@@ -146,6 +148,8 @@ export class Game {
                 x >= card.x && x <= card.x + card.width &&
                 y >= card.y && y <= card.y + card.height) {
 
+                this.soundManager.play('click');
+
                 card.isFlipped = true;
                 this.flippedCards.push(card);
                 break;
@@ -166,6 +170,8 @@ export class Game {
 
             card1.isMatched = true;
             card2.isMatched = true;
+
+            this.soundManager.play('match');
 
             const allMatched = this.deck.every(card => card.isMatched);
             if (allMatched) {
