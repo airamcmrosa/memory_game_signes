@@ -104,7 +104,36 @@ window.onload = function () {
     canvas.addEventListener('click', handleInteraction);
     canvas.addEventListener('touchstart', handleInteraction);
 
+    canvas.addEventListener('mousemove', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
 
+        let onClickableElement = false;
+
+        // 1. Verifica se o mouse está sobre a área do footer
+        // Adiciona uma verificação para garantir que footer.footerArea e suas propriedades existem
+        if (footer.footerArea && footer.footerArea.width &&
+            isClickInside(footer.footerArea, mouseX, mouseY)) {
+            onClickableElement = true;
+        }
+
+        if (gameState === 'menu' && menu.playButton && menu.playButton.width &&
+            isClickInside(menu.playButton, mouseX, mouseY)) {
+            onClickableElement = true;
+        }
+
+        if (gameState === 'gameOver' && playAgainButton && playAgainButton.width &&
+            isClickInside(playAgainButton, mouseX, mouseY)) {
+            onClickableElement = true;
+        }
+
+        if (onClickableElement) {
+            canvas.style.cursor = 'pointer';
+        } else {
+            canvas.style.cursor = 'default';
+        }
+    });
 
 
     function animate() {
