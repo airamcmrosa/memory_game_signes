@@ -88,6 +88,10 @@ window.onload = function () {
             mouseY = event.clientY - rect.top;
         }
 
+        if(isClickInside(footer.footerArea, mouseX, mouseY)) {
+            footer.handleInput(mouseX, mouseY);
+        }
+
         if (gameState === 'menu' && isClickInside(menu.playButton, mouseX, mouseY)) {
             startGame();
         } else if (gameState === 'playing' && game) {
@@ -99,6 +103,8 @@ window.onload = function () {
 
     canvas.addEventListener('click', handleInteraction);
     canvas.addEventListener('touchstart', handleInteraction);
+
+
 
 
     function animate() {
