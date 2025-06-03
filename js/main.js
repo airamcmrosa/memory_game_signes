@@ -5,6 +5,7 @@ import {Game} from "./game.js";
 import {SoundManager} from "./soundManager.js";
 
 
+
 window.onload = function () {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -98,45 +99,10 @@ window.onload = function () {
     canvas.addEventListener('touchstart', handleInteraction);
 
     function drawEndGameScreen() {
-        // Overlay semitransparente
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // --- CÁLCULOS DINÂMICOS ---
-        // 1. Calcula o tamanho da fonte do título, garantindo que seja no mínimo 30px.
-        const titleFontSize = Math.max(18, canvas.width / 25);
-
-        // 2. Calcula o tamanho da fonte do botão, relativo ao título, com um mínimo de 18px.
-        const buttonFontSize = Math.max(10, titleFontSize / 2);
 
 
-        ctx.fillStyle = 'white';
-
-        ctx.font = `${titleFontSize}px "Press Start 2P"`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('Félicitations!', canvas.width / 2, canvas.height / 2 - 80);
 
 
-        const btnWidth = Math.min(canvas.width / 3.5, 320); // Usa 1/3.5 da tela, no máximo 320px
-        const btnHeight = 70;
-
-        playAgainButton = {
-            width: btnWidth,
-            height: btnHeight,
-            x: canvas.width / 2 - (btnWidth / 2),
-            y: canvas.height / 2,
-            text: 'Play Again'
-        };
-
-        const btn = playAgainButton;
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
-
-        // 4. Usa a variável buttonFontSize
-        ctx.font = `${buttonFontSize}px "Press Start 2P"`;
-        ctx.fillText(btn.text, canvas.width / 2, btn.y + btn.height / 2);
     }
 
 
